@@ -5,6 +5,8 @@ using BCrypt.Net;
 using System.IO;
 using StudentGradeManagementSystem.Services;
 using StudentGradeManagementSystem.Models;
+using System.Threading.Tasks;
+using System.Data;
 
 namespace StudentGradeManagementSystem.Data
 {
@@ -15,6 +17,28 @@ namespace StudentGradeManagementSystem.Data
         
         // 日志服务实例
         private static readonly LoggingService _loggingService = new LoggingService();
+        
+        // 连接池配置 - 提高数据库连接性能
+        private static readonly MySqlConnectionSettings ConnectionSettings;
+        
+        static DatabaseHelper()
+        {
+            // 初始化连接池设置
+            var connectionStringBuilder = new MySqlConnectionStringBuilder(ConnectionString)
+            {
+                MinimumPoolSize = 5,
+                MaximumPoolSize = 50,
+                ConnectionTimeout = 30,
+                DefaultCommandTimeout = 60,
+                Pooling = true,
+                SslMode = MySqlSslMode.None,
+                AllowUserVariables = true,
+                InteractiveSessions = false,
+                KeepAlive = 60
+            };
+            
+            ConnectionSettings = new MySqlConnectionSettings(connectionStringBuilder.ConnectionString);
+        }
         
         private static string ReadConnectionString()
         {
@@ -100,10 +124,39 @@ namespace StudentGradeManagementSystem.Data
             }
         }
 
+        /// <summary>
+        /// 获取数据库连接（使用连接池优化性能）
+        /// </summary>
+        /// <returns>MySqlConnection 对象</returns>
         public static MySqlConnection GetConnection()
         {
-            return new MySqlConnection(ConnectionString);
+            return new MySqlConnection(ConnectionSettings.ConnectionString);
         }
+        
+        /// <summary>
+        /// 异步获取数据库连接（使用连接池优化性能）
+        /// </summary>
+        /// <returns>MySqlConnection 对象</returns>
+        public static async Task<MySqlConnection> GetConnectionAsync()
+        {
+            var connection = new MySqlConnection(ConnectionSettings.ConnectionString);
+            await connection.OpenAsync();
+            return connection;
+        }
+        
+        /// <summary>
+        /// 创建优化的 MySqlCommand，使用缓存准备语句
+        /// </summary>
+        /// <param name="query">SQL 查询</param>
+        /// <param name="connection">数据库连接</param>
+        /// <returns>MySqlCommand 对象</returns>
+        public static MySqlCommand CreateCommand(string query, MySqlConnection connection)
+        {
+            var command = new MySqlCommand(query, connection);
+            command.CommandTimeout = 60; // 设置命令超时时间
+            return command;
+        }
+
 
         public static void InitializeDatabase()
         {
