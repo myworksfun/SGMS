@@ -31,14 +31,14 @@ namespace StudentGradeManagementSystem.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            lblUsername = new Label();
-            txtUsername = new TextBox();
-            lblPassword = new Label();
-            txtPassword = new TextBox();
-            btnLogin = new Button();
-            btnCancel = new Button();
-            lblVersion = new Label();
-            chkRememberMe = new CheckBox();
+            lblUsername = new AntdUI.Label();
+            txtUsername = new AntdUI.TextBox();
+            lblPassword = new AntdUI.Label();
+            txtPassword = new AntdUI.TextBox();
+            btnLogin = new AntdUI.Button();
+            btnCancel = new AntdUI.Button();
+            lblVersion = new AntdUI.Label();
+            chkRememberMe = new AntdUI.CheckBox();
             SuspendLayout();
             // 
             // lblUsername
@@ -88,7 +88,6 @@ namespace StudentGradeManagementSystem.Forms
             btnLogin.Size = new Size(88, 33);
             btnLogin.TabIndex = 4;
             btnLogin.Text = "登录";
-            btnLogin.UseVisualStyleBackColor = true;
             btnLogin.Click += btnLogin_Click;
             // 
             // btnCancel
@@ -99,7 +98,6 @@ namespace StudentGradeManagementSystem.Forms
             btnCancel.Size = new Size(88, 33);
             btnCancel.TabIndex = 5;
             btnCancel.Text = "取消";
-            btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
             // 
             // lblVersion
@@ -121,7 +119,6 @@ namespace StudentGradeManagementSystem.Forms
             chkRememberMe.Size = new Size(123, 21);
             chkRememberMe.TabIndex = 3;
             chkRememberMe.Text = "记住用户名和密码";
-            chkRememberMe.UseVisualStyleBackColor = true;
             // 
             // LoginForm
             // 
@@ -151,13 +148,13 @@ namespace StudentGradeManagementSystem.Forms
 
         #endregion
 
-        private System.Windows.Forms.Label lblUsername;
-        private System.Windows.Forms.TextBox txtUsername;
-        private System.Windows.Forms.Label lblPassword;
-        private System.Windows.Forms.TextBox txtPassword;
-        private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Label lblVersion;
-        private System.Windows.Forms.CheckBox chkRememberMe;
+        private AntdUI.Label lblUsername;
+        private AntdUI.TextBox txtUsername;
+        private AntdUI.Label lblPassword;
+        private AntdUI.TextBox txtPassword;
+        private AntdUI.Button btnLogin;
+        private AntdUI.Button btnCancel;
+        private AntdUI.Label lblVersion;
+        private AntdUI.CheckBox chkRememberMe;
     }
 }

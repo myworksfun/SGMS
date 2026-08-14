@@ -33,10 +33,10 @@ namespace StudentGradeManagementSystem.Forms
             this.dataGridViewUserLogs = new System.Windows.Forms.DataGridView();
             this.tabPageSystemLogs = new System.Windows.Forms.TabPage();
             this.dataGridViewSystemLogs = new System.Windows.Forms.DataGridView();
-            this.panelButtons = new System.Windows.Forms.Panel();
-            this.btnExport = new System.Windows.Forms.Button();
-            this.btnDelete = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
+            this.panelButtons = new AntdUI.Panel();
+            this.btnExport = new AntdUI.Button();
+            this.btnDelete = new AntdUI.Button();
+            this.btnRefresh = new AntdUI.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.paginationControlUserLogs = new StudentGradeManagementSystem.Controls.PaginationControl();
@@ -228,12 +228,12 @@ namespace StudentGradeManagementSystem.Forms
         private System.Windows.Forms.DataGridView dataGridViewUserLogs;
         private System.Windows.Forms.TabPage tabPageSystemLogs;
         private System.Windows.Forms.DataGridView dataGridViewSystemLogs;
-        private System.Windows.Forms.Panel panelButtons;
-        private System.Windows.Forms.Button btnRefresh;
-        private System.Windows.Forms.Button btnExport;
+        private AntdUI.Panel panelButtons;
+        private AntdUI.Button btnRefresh;
+        private AntdUI.Button btnExport;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.Button btnDelete;
+        private AntdUI.Button btnDelete;
         private StudentGradeManagementSystem.Controls.PaginationControl paginationControlUserLogs;
         private StudentGradeManagementSystem.Controls.PaginationControl paginationControlSystemLogs;
     }
