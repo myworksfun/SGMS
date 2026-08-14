@@ -1,5 +1,3 @@
-using Sunny.UI;
-
 namespace StudentGradeManagementSystem.Forms
 {
     partial class ChangePasswordForm
@@ -30,49 +28,44 @@ namespace StudentGradeManagementSystem.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            uiPanel1 = new UIPanel();
-            btnCancel = new UIButton();
-            btnConfirm = new UIButton();
-            txtConfirmPassword = new UITextBox();
-            lblConfirmPassword = new UILabel();
-            txtNewPassword = new UITextBox();
-            lblNewPassword = new UILabel();
-            txtOldPassword = new UITextBox();
-            lblOldPassword = new UILabel();
-            uiPanel1.SuspendLayout();
+            panel1 = new AntdUI.Panel();
+            btnCancel = new AntdUI.Button();
+            btnConfirm = new AntdUI.Button();
+            txtConfirmPassword = new AntdUI.TextBox();
+            lblConfirmPassword = new AntdUI.Label();
+            txtNewPassword = new AntdUI.TextBox();
+            lblNewPassword = new AntdUI.Label();
+            txtOldPassword = new AntdUI.TextBox();
+            lblOldPassword = new AntdUI.Label();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
-            // uiPanel1
+            // panel1
             // 
-            uiPanel1.Controls.Add(btnCancel);
-            uiPanel1.Controls.Add(btnConfirm);
-            uiPanel1.Controls.Add(txtConfirmPassword);
-            uiPanel1.Controls.Add(lblConfirmPassword);
-            uiPanel1.Controls.Add(txtNewPassword);
-            uiPanel1.Controls.Add(lblNewPassword);
-            uiPanel1.Controls.Add(txtOldPassword);
-            uiPanel1.Controls.Add(lblOldPassword);
-            uiPanel1.Font = new Font("微软雅黑", 12F);
-            uiPanel1.Location = new Point(12, 12);
-            uiPanel1.Margin = new Padding(4, 5, 4, 5);
-            uiPanel1.MinimumSize = new Size(1, 1);
-            uiPanel1.Name = "uiPanel1";
-            uiPanel1.Size = new Size(420, 280);
-            uiPanel1.TabIndex = 0;
-            uiPanel1.Text = null;
-            uiPanel1.TextAlignment = ContentAlignment.MiddleCenter;
+            panel1.Controls.Add(btnCancel);
+            panel1.Controls.Add(btnConfirm);
+            panel1.Controls.Add(txtConfirmPassword);
+            panel1.Controls.Add(lblConfirmPassword);
+            panel1.Controls.Add(txtNewPassword);
+            panel1.Controls.Add(lblNewPassword);
+            panel1.Controls.Add(txtOldPassword);
+            panel1.Controls.Add(lblOldPassword);
+            panel1.Font = new Font("微软雅黑", 12F);
+            panel1.Location = new Point(12, 12);
+            panel1.Margin = new Padding(4, 5, 4, 5);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(420, 280);
+            panel1.TabIndex = 0;
             // 
             // btnCancel
             // 
             btnCancel.Cursor = Cursors.Hand;
             btnCancel.Font = new Font("微软雅黑", 12F);
             btnCancel.Location = new Point(231, 199);
-            btnCancel.MinimumSize = new Size(1, 1);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(100, 35);
             btnCancel.TabIndex = 4;
             btnCancel.Text = "取消";
-            btnCancel.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             btnCancel.Click += btnCancel_Click;
             // 
             // btnConfirm
@@ -80,29 +73,21 @@ namespace StudentGradeManagementSystem.Forms
             btnConfirm.Cursor = Cursors.Hand;
             btnConfirm.Font = new Font("微软雅黑", 12F);
             btnConfirm.Location = new Point(90, 199);
-            btnConfirm.MinimumSize = new Size(1, 1);
             btnConfirm.Name = "btnConfirm";
             btnConfirm.Size = new Size(100, 35);
             btnConfirm.TabIndex = 3;
             btnConfirm.Text = "确认";
-            btnConfirm.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             btnConfirm.Click += btnConfirm_Click;
             // 
             // txtConfirmPassword
             // 
-            txtConfirmPassword.Cursor = Cursors.IBeam;
             txtConfirmPassword.Font = new Font("微软雅黑", 12F);
             txtConfirmPassword.Location = new Point(140, 140);
             txtConfirmPassword.Margin = new Padding(4, 5, 4, 5);
-            txtConfirmPassword.MinimumSize = new Size(1, 1);
             txtConfirmPassword.Name = "txtConfirmPassword";
-            txtConfirmPassword.Padding = new Padding(5);
             txtConfirmPassword.PasswordChar = '*';
-            txtConfirmPassword.ShowText = false;
             txtConfirmPassword.Size = new Size(220, 29);
             txtConfirmPassword.TabIndex = 2;
-            txtConfirmPassword.TextAlignment = ContentAlignment.MiddleLeft;
-            txtConfirmPassword.Watermark = "";
             // 
             // lblConfirmPassword
             // 
@@ -117,19 +102,13 @@ namespace StudentGradeManagementSystem.Forms
             // 
             // txtNewPassword
             // 
-            txtNewPassword.Cursor = Cursors.IBeam;
             txtNewPassword.Font = new Font("微软雅黑", 12F);
             txtNewPassword.Location = new Point(140, 90);
             txtNewPassword.Margin = new Padding(4, 5, 4, 5);
-            txtNewPassword.MinimumSize = new Size(1, 1);
             txtNewPassword.Name = "txtNewPassword";
-            txtNewPassword.Padding = new Padding(5);
             txtNewPassword.PasswordChar = '*';
-            txtNewPassword.ShowText = false;
             txtNewPassword.Size = new Size(220, 29);
             txtNewPassword.TabIndex = 1;
-            txtNewPassword.TextAlignment = ContentAlignment.MiddleLeft;
-            txtNewPassword.Watermark = "";
             // 
             // lblNewPassword
             // 
@@ -144,19 +123,13 @@ namespace StudentGradeManagementSystem.Forms
             // 
             // txtOldPassword
             // 
-            txtOldPassword.Cursor = Cursors.IBeam;
             txtOldPassword.Font = new Font("微软雅黑", 12F);
             txtOldPassword.Location = new Point(140, 40);
             txtOldPassword.Margin = new Padding(4, 5, 4, 5);
-            txtOldPassword.MinimumSize = new Size(1, 1);
             txtOldPassword.Name = "txtOldPassword";
-            txtOldPassword.Padding = new Padding(5);
             txtOldPassword.PasswordChar = '*';
-            txtOldPassword.ShowText = false;
             txtOldPassword.Size = new Size(220, 29);
             txtOldPassword.TabIndex = 0;
-            txtOldPassword.TextAlignment = ContentAlignment.MiddleLeft;
-            txtOldPassword.Watermark = "";
             // 
             // lblOldPassword
             // 
@@ -173,7 +146,7 @@ namespace StudentGradeManagementSystem.Forms
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(428, 268);
-            Controls.Add(uiPanel1);
+            Controls.Add(panel1);
             MaximizeBox = false;
             MaximumSize = new Size(444, 307);
             MinimizeBox = false;
@@ -182,21 +155,21 @@ namespace StudentGradeManagementSystem.Forms
             StartPosition = FormStartPosition.CenterParent;
             Text = "修改密码";
             Load += ChangePasswordForm_Load;
-            uiPanel1.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
 
         }
 
         #endregion
 
-        private UIPanel uiPanel1;
-        private UITextBox txtOldPassword;
-        private UILabel lblOldPassword;
-        private UITextBox txtConfirmPassword;
-        private UILabel lblConfirmPassword;
-        private UITextBox txtNewPassword;
-        private UILabel lblNewPassword;
-        private UIButton btnCancel;
-        private UIButton btnConfirm;
+        private AntdUI.Panel panel1;
+        private AntdUI.TextBox txtOldPassword;
+        private AntdUI.Label lblOldPassword;
+        private AntdUI.TextBox txtConfirmPassword;
+        private AntdUI.Label lblConfirmPassword;
+        private AntdUI.TextBox txtNewPassword;
+        private AntdUI.Label lblNewPassword;
+        private AntdUI.Button btnCancel;
+        private AntdUI.Button btnConfirm;
     }
 }

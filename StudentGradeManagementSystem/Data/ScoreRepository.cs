@@ -482,24 +482,23 @@ namespace StudentGradeManagementSystem.Data
         #endregion
 
         #region 私有方法
-
         /// <summary>
-        /// 从IDataReader创建Score对象
+        /// 从 IDataReader 创建 Score 对象（优化版本，使用 GetOrdinal 缓存）
         /// </summary>
         private Score CreateScoreFromReader(MySqlDataReader reader)
         {
             return new Score
             {
-                Id = reader.GetOrdinal("id") >= 0 && reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
-                student_id = reader.GetOrdinal("student_id") >= 0 ? (reader["student_id"] != DBNull.Value ? reader["student_id"].ToString() ?? string.Empty : string.Empty) : string.Empty,
-                StudentName = reader.GetOrdinal("student_name") >= 0 ? (reader["student_name"] != DBNull.Value ? reader["student_name"]?.ToString() ?? string.Empty : string.Empty) : string.Empty,
-                course_id = reader.GetOrdinal("course_id") >= 0 ? (reader["course_id"] != DBNull.Value ? reader["course_id"].ToString() ?? string.Empty : string.Empty) : string.Empty,
-                CourseName = reader.GetOrdinal("course_name") >= 0 ? (reader["course_name"] != DBNull.Value ? reader["course_name"]?.ToString() ?? string.Empty : string.Empty) : string.Empty,
-                score = reader.GetOrdinal("score") >= 0 && reader["score"] != DBNull.Value ? Convert.ToDecimal(reader["score"]) : 0,
-                term = reader.GetOrdinal("term") >= 0 ? (reader["term"] != DBNull.Value ? reader["term"].ToString() ?? string.Empty : string.Empty) : string.Empty,
-                exam_date = reader.GetOrdinal("exam_date") >= 0 && reader["exam_date"] != DBNull.Value ? Convert.ToDateTime(reader["exam_date"]) : (DateTime?)null,
-                CreatedAt = reader.GetOrdinal("created_at") >= 0 && reader["created_at"] != DBNull.Value ? Convert.ToDateTime(reader["created_at"]) : DateTime.Now,
-                UpdatedAt = reader.GetOrdinal("updated_at") >= 0 && reader["updated_at"] != DBNull.Value ? Convert.ToDateTime(reader["updated_at"]) : DateTime.Now
+                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                student_id = reader.GetString(reader.GetOrdinal("student_id")),
+                StudentName = reader.IsDBNull(reader.GetOrdinal("student_name")) ? string.Empty : reader.GetString(reader.GetOrdinal("student_name")),
+                course_id = reader.GetString(reader.GetOrdinal("course_id")),
+                CourseName = reader.IsDBNull(reader.GetOrdinal("course_name")) ? string.Empty : reader.GetString(reader.GetOrdinal("course_name")),
+                score = reader.GetDecimal(reader.GetOrdinal("score")),
+                term = reader.GetString(reader.GetOrdinal("term")),
+                exam_date = reader.IsDBNull(reader.GetOrdinal("exam_date")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("exam_date")),
+                CreatedAt = reader.IsDBNull(reader.GetOrdinal("created_at")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("created_at")),
+                UpdatedAt = reader.IsDBNull(reader.GetOrdinal("updated_at")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("updated_at"))
             };
         }
 

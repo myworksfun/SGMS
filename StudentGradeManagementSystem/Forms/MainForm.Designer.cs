@@ -1,5 +1,3 @@
-using Sunny.UI;
-
 namespace StudentGradeManagementSystem.Forms
 {
     partial class MainForm
