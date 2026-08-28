@@ -21,12 +21,23 @@ namespace StudentGradeManagementSystem.Data
             try
             {
                 var config = ReadConfig();
-                return $"server={config["server"]};user={config["user"]};password={config["password"]};database={config["database"]};charset=utf8mb4";
+                
+                // 优先从环境变量读取密码（安全性更高）
+                string password = Environment.GetEnvironmentVariable("SGMS_DB_PASSWORD");
+                if (string.IsNullOrEmpty(password))
+                {
+                    // 如果环境变量未设置，则从配置文件读取
+                    password = config.ContainsKey("password") ? config["password"] : "";
+                }
+                
+                // 构建连接字符串，添加连接池配置
+                return $"server={config["server"]};user={config["user"]};password={password};database={config["database"]};charset=utf8mb4;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;Connection Lifetime=180";
             }
-            catch
+            catch (Exception ex)
             {
-                // 如果配置文件读取失败，使用默认连接字符串
-                return "server=localhost;user=root;password=123;database=student_grade_db;charset=utf8mb4";
+                _loggingService.LogError("Read Connection String", "读取数据库配置失败，使用默认连接字符串", ex.ToString());
+                // 如果配置文件读取失败，使用默认连接字符串（仅用于开发环境）
+                return "server=localhost;user=root;password=123;database=student_grade_db;charset=utf8mb4;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;Connection Lifetime=180";
             }
         }
         
@@ -35,12 +46,23 @@ namespace StudentGradeManagementSystem.Data
             try
             {
                 var config = ReadConfig();
-                return $"server={config["server"]};user={config["user"]};password={config["password"]};charset=utf8mb4";
+                
+                // 优先从环境变量读取密码（安全性更高）
+                string password = Environment.GetEnvironmentVariable("SGMS_DB_PASSWORD");
+                if (string.IsNullOrEmpty(password))
+                {
+                    // 如果环境变量未设置，则从配置文件读取
+                    password = config.ContainsKey("password") ? config["password"] : "";
+                }
+                
+                // 构建连接字符串，添加连接池配置
+                return $"server={config["server"]};user={config["user"]};password={password};charset=utf8mb4;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;Connection Lifetime=180";
             }
-            catch
+            catch (Exception ex)
             {
-                // 如果配置文件读取失败，使用默认连接字符串
-                return "server=localhost;user=root;password=123;charset=utf8mb4";
+                _loggingService.LogError("Read Base Connection String", "读取数据库配置失败，使用默认连接字符串", ex.ToString());
+                // 如果配置文件读取失败，使用默认连接字符串（仅用于开发环境）
+                return "server=localhost;user=root;password=123;charset=utf8mb4;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;Connection Lifetime=180";
             }
         }
         
@@ -54,10 +76,19 @@ namespace StudentGradeManagementSystem.Data
             var config = new Dictionary<string, string>();
             foreach (var line in lines)
             {
+                // 跳过注释行和空行
+                if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("#"))
+                {
+                    continue;
+                }
+                
                 if (line.Contains("="))
                 {
-                    var parts = line.Split('=');
-                    config[parts[0].Trim()] = parts[1].Trim();
+                    var parts = line.Split('=', 2); // 限制分割次数，避免值中包含等号
+                    if (parts.Length == 2)
+                    {
+                        config[parts[0].Trim()] = parts[1].Trim();
+                    }
                 }
             }
             return config;
@@ -149,7 +180,7 @@ namespace StudentGradeManagementSystem.Data
                                                 )";
                     new MySqlCommand(createOperationLogsTable, connection).ExecuteNonQuery();
                     
-                    // 创建学生表
+                    // 创建学生表（带索引优化）
                     var createStudentsTable = @"CREATE TABLE IF NOT EXISTS students (
                                                id INT AUTO_INCREMENT PRIMARY KEY,
                                                student_id VARCHAR(20) UNIQUE NOT NULL,
@@ -163,11 +194,14 @@ namespace StudentGradeManagementSystem.Data
                                                enrollment_date DATE,
                                                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                                                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                               deleted_at DATETIME NULL
+                                               deleted_at DATETIME NULL,
+                                               INDEX idx_student_id (student_id),
+                                               INDEX idx_name (name),
+                                               INDEX idx_deleted_at (deleted_at)
                                            )";
                     new MySqlCommand(createStudentsTable, connection).ExecuteNonQuery();
                     
-                    // 创建教师表
+                    // 创建教师表（带索引优化）
                     var createTeachersTable = @"CREATE TABLE IF NOT EXISTS teachers (
                                                id INT AUTO_INCREMENT PRIMARY KEY,
                                                teacher_id VARCHAR(20) UNIQUE NOT NULL,
@@ -180,11 +214,14 @@ namespace StudentGradeManagementSystem.Data
                                                email VARCHAR(100),
                                                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                                                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                               deleted_at DATETIME NULL
+                                               deleted_at DATETIME NULL,
+                                               INDEX idx_teacher_id (teacher_id),
+                                               INDEX idx_name (name),
+                                               INDEX idx_deleted_at (deleted_at)
                                            )";
                     new MySqlCommand(createTeachersTable, connection).ExecuteNonQuery();
                     
-                    // 创建课程表
+                    // 创建课程表（带索引优化）
                     var createCoursesTable = @"CREATE TABLE IF NOT EXISTS courses (
                                               id INT AUTO_INCREMENT PRIMARY KEY,
                                               course_id VARCHAR(20) UNIQUE NOT NULL,
@@ -196,11 +233,14 @@ namespace StudentGradeManagementSystem.Data
                                               created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                                               updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                               deleted_at DATETIME NULL,
+                                              INDEX idx_course_id (course_id),
+                                              INDEX idx_teacher_id (teacher_id),
+                                              INDEX idx_deleted_at (deleted_at),
                                               FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE SET NULL
                                           )";
                     new MySqlCommand(createCoursesTable, connection).ExecuteNonQuery();
                     
-                    // 创建成绩表
+                    // 创建成绩表（带索引优化）
                     var createScoresTable = @"CREATE TABLE IF NOT EXISTS scores (
                                              id INT AUTO_INCREMENT PRIMARY KEY,
                                              student_id VARCHAR(20) NOT NULL,
@@ -210,6 +250,9 @@ namespace StudentGradeManagementSystem.Data
                                              exam_date DATE,
                                              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                                              updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                             INDEX idx_student_id (student_id),
+                                             INDEX idx_course_id (course_id),
+                                             INDEX idx_term (term),
                                              FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
                                              FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
                                          )";
@@ -261,14 +304,20 @@ namespace StudentGradeManagementSystem.Data
                     var userCount = Convert.ToInt32(command.ExecuteScalar());
                     if (userCount == 0)
                     {
-                        // 默认密码：admin123
-                        var passwordHash = BCrypt.Net.BCrypt.HashPassword("admin123");
-                        var insertUserQuery = "INSERT INTO users (username, password_hash, role_id) VALUES ('admin', @password_hash, 1)";
+                        // 生成安全的随机密码（16 位），替代弱密码 admin123
+                        string securePassword = PasswordComplexityService.GenerateSecurePassword(16);
+                        var passwordHash = BCrypt.Net.BCrypt.HashPassword(securePassword);
+                        var insertUserQuery = "INSERT INTO users (username, password_hash, role_id, require_password_change) VALUES ('admin', @password_hash, 1, TRUE)";
                         using (var command2 = new MySqlCommand(insertUserQuery, connection))
                         {
                             command2.Parameters.AddWithValue("@password_hash", passwordHash);
                             command2.ExecuteNonQuery();
                         }
+                        
+                        // 记录初始密码到日志（实际应用中应通过更安全的方式告知管理员）
+                        _loggingService.LogSystemEvent("Initial Admin Password", 
+                            $"初始管理员密码已生成：{securePassword}\n" +
+                            $"请注意：此密码仅显示一次，请妥善保管。首次登录时必须修改密码。");
                     }
                 }
             }
