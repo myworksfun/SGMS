@@ -4,7 +4,6 @@ using StudentGradeManagementSystem.Services;
 using StudentGradeManagementSystem.Models;
 using StudentGradeManagementSystem.Data;
 using MySqlConnector;
-// 添加BCrypt引用
 using BCrypt.Net;
 
 namespace StudentGradeManagementSystem.Forms
@@ -19,16 +18,12 @@ namespace StudentGradeManagementSystem.Forms
         private void ChangePasswordForm_Load(object sender, EventArgs e)
         {
             Text = "修改密码";
+            // 显示密码复杂度要求
+            lblPasswordRequirements.Text = "密码要求：至少 8 位，包含大小写字母、数字和特殊字符";
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            // 密码强度检测
-            if (txtNewPassword.Text.Length < 8)
-            {
-                MessageBox.Show("密码长度至少为8位", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
             string oldPassword = txtOldPassword.Text;
             string newPassword = txtNewPassword.Text;
             string confirmPassword = txtConfirmPassword.Text;
@@ -63,15 +58,34 @@ namespace StudentGradeManagementSystem.Forms
                 return;
             }
 
-            if (newPassword.Length < 6)
+            // 使用新的密码复杂度验证服务
+            var (isValid, errorMessage) = PasswordComplexityService.ValidatePasswordComplexity(newPassword);
+            if (!isValid)
             {
-                MessageBox.Show("新密码长度不能少于6位", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(errorMessage, "密码复杂度不足", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNewPassword.Focus();
+                txtNewPassword.SelectAll();
                 return;
             }
 
-            // 获取当前用户
+            // 检查密码是否包含用户名
             var currentUser = CurrentUser.GetCurrentUser();
+            if (currentUser != null)
+            {
+                var (isSafe, warningMessage) = PasswordComplexityService.CheckPasswordContainsUsername(newPassword, currentUser.Username);
+                if (!isSafe)
+                {
+                    var result = MessageBox.Show($"{warningMessage}\n是否继续使用此密码？", "安全警告", 
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result == DialogResult.No)
+                    {
+                        txtNewPassword.Focus();
+                        txtNewPassword.SelectAll();
+                        return;
+                    }
+                }
+            }
+
             if (currentUser == null)
             {
                 MessageBox.Show("未登录用户", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -90,13 +104,13 @@ namespace StudentGradeManagementSystem.Forms
             // 更新密码到数据库
             try
             {
-                // 使用BCrypt哈希算法保持与系统其他部分一致
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                // 使用 PasswordService 进行哈希（会自动验证复杂度）
+                string hashedPassword = PasswordService.HashPassword(newPassword);
                 
                 using (var connection = DatabaseHelper.GetConnection())
                 {
                     connection.Open();
-                    var query = "UPDATE users SET password_hash = @password_hash WHERE id = @user_id";
+                    var query = "UPDATE users SET password_hash = @password_hash, require_password_change = 0 WHERE id = @user_id";
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@password_hash", hashedPassword);
@@ -105,6 +119,19 @@ namespace StudentGradeManagementSystem.Forms
                         int rowsAffected = command.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
+                            // 记录密码修改日志
+                            var logRepository = new LogRepository();
+                            var log = new OperationLog
+                            {
+                                UserId = currentUser.Id,
+                                Username = currentUser.Username,
+                                Operation = "修改密码",
+                                Description = $"用户 {currentUser.Username} 修改了登录密码",
+                                IPAddress = NetworkUtils.GetLocalIPAddress(),
+                                UserAgent = Environment.MachineName
+                            };
+                            logRepository.AddUserLog(log);
+
                             MessageBox.Show("密码修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             DialogResult = DialogResult.OK;
                             Close();
@@ -116,9 +143,15 @@ namespace StudentGradeManagementSystem.Forms
                     }
                 }
             }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"密码不符合要求：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtNewPassword.Focus();
+                txtNewPassword.SelectAll();
+            }
             catch (Exception ex)
             {
-                MessageBox.Show($"密码修改失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"密码修改失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -126,6 +159,16 @@ namespace StudentGradeManagementSystem.Forms
         {
             DialogResult = DialogResult.Cancel;
             Close();
+        }
+
+        private void btnGeneratePassword_Click(object sender, EventArgs e)
+        {
+            // 生成符合复杂度要求的随机密码
+            var securePassword = PasswordComplexityService.GenerateSecurePassword(16);
+            txtNewPassword.Text = securePassword;
+            txtConfirmPassword.Text = securePassword;
+            
+            MessageBox.Show("已生成强密码，请妥善保管", "密码已生成", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
